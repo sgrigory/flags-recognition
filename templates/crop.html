@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Select the area</title>
+  <link rel="stylesheet" href="/static/css/cropper.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.css">
+  <style>
+    .container {
+      margin: 20px auto;
+      max-width: 640px;
+    }
+
+    .column {
+      float: center;
+      width: 45%;
+    }
+
+    .row: after {
+    content: "";
+    display: table;
+    clear: both;
+
+    }
+
+    .row1: after {
+    content: "";
+    display: table;
+    clear: both;
+
+    }
+
+
+    .column1 {
+      float: left;
+      width: 45%;
+    }
+
+    #recognize {
+      font-size: 24px;
+      width: 100px;
+      height: 100px;
+
+    }
+
+  </style>
+</head>
+<body>
+
+
+  <div>
+  <div class="row">
+
+    <div class="column">
+      <form action="{{ url_for('upload_image') }}" class="dropzone" id="my-dropzone">
+      </form>
+    </div>
+
+    <div class="column">
+      <div class="container">
+        <form id="send_crop" action="/" method="POST">
+          <button type="button" id="recognize" name="bt" value="init">Go</button>
+          <input id="secret" type="hidden" name="secret" value="a">
+        </form>
+      </div>
+    </div>
+
+  </div>
+  </div>
+
+      <!--<div style="width:50%">-->
+        <!--<form action="{{ url_for('upload_image') }}" class="dropzone" id="my-dropzone">-->
+        <!--</form>-->
+      <!--</div>-->
+
+      <!--<div class="container">-->
+        <!--<form id="send_crop" action="/" method="POST">-->
+          <!--<button type="button" id="recognize" name="bt" value="init">Go</button>-->
+          <!--<input id="secret" type="hidden" name="secret" value="a">-->
+        <!--</form>-->
+      <!--</div>-->
+<div>
+  <div class="row1">
+    <div class="column1" id="column1">
+      <div id="img-container">
+        <img id="image" src="/uploads/example1.jpeg" alt="Picture" style="width:100%; pointer-events:auto;">
+        <canvas id="myCanvas" style="z-index: 100; pointer-events:none;"> </canvas>
+      </div>
+    </div>
+
+    <div class="column1" id="column2" style="float:right;">
+      <div id="predictions">
+      </div>
+    </div>
+  </div>
+
+</div>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+
+      Dropzone.autoDiscover = false;
+      Dropzone.options.dzone = {
+          acceptedFiles: "*.jpeg, *.jpg"
+          }
+
+      $(function() {
+        var myDropzone = new Dropzone("#my-dropzone");
+        myDropzone.on("queuecomplete", function(file) {
+          // Called when all files in the queue finish uploading.
+          window.location = "{{ url_for('recognize') }}";
+        });
+      })
+    </script>
+
+
+  <script src="/static/js/cropper.js"></script>
+  <script src="/static/js/flags.js"></script>
+  <script>
+
+
+    var img = document.getElementById("image");
+    var cnv = document.getElementById("myCanvas");
+    var ctx = getContext(cnv, img);
+    var img_width = {{img_width|safe}};
+    var img_height = {{img_height|safe}};
+    if ((img_width != "") && (img_height != ""))
+      {
+      // Coordinates of 4 corners of the detected flag border
+      var x = {{x_coords|safe}};
+      var y = {{y_coords|safe}};
+      console.log(x, y);
+      var cropData = {{cropData|safe}};
+      drawBorder(x, y, cropData, img, img_width, img_height, ctx);
+
+    };
+
+    // Show possible matches
+
+    pred_files = {{pred_files|safe}};
+    pred_names = {{pred_names|safe}};
+    probs = {{probs|safe}};
+    addPredictions(pred_files, pred_names, probs);
+
+
+
+    window.addEventListener('DOMContentLoaded', function () {
+
+      console.log("DOMContentLoaded!");
+
+      var image = document.querySelector('#image');
+      console.log("create new cropper", {{cropData|safe}});
+      var cropper = new Cropper(image, {
+        aspectRatio: 1,
+        data: {{cropData|safe}},
+        movable: false,
+        zoomable: false,
+        rotatable: false,
+        scalable: false
+      });
+      console.log(cropper);
+
+      document.getElementById('recognize').onclick = function () {
+       console.log("recognize clicked!");
+
+        document.getElementById('secret').value = JSON.stringify(cropper.getData());
+        cropper.destroy();
+        document.getElementById("send_crop").submit();
+      };
+    });
+
+
+  </script>
+
+
+</body>
+</html>
