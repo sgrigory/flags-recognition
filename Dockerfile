@@ -1,20 +1,26 @@
-FROM python:3.7
+FROM tensorflow/tensorflow:latest
 
 WORKDIR /usr/app
 
-COPY app.py utils.py requirements.txt templates static countries run_[]_cls_233_lr_0.001_bs_256_ts_8_tp_15288561_8620_model.hdf5 ./
-
-RUN mkdir uploads
-
-RUN ls
-
-RUN pip install --upgrade pip
+COPY requirements.txt ./
 
 RUN pip install -r requirements.txt
 
+RUN yes | apt update && yes | apt install libgl1-mesa-glx
 
+RUN mkdir uploads
+
+COPY templates templates
+COPY static static
+COPY countries countries
+
+COPY app.py utils.py run_[[]]_cls_233_lr_0.001_bs_256_ts_8_tp_15288561_8620_model.hdf5 ./
+
+RUN cat /etc/os-release
 
 EXPOSE 5000
+
+RUN ls
 
 CMD ["python", "app.py"]
 
