@@ -71,16 +71,6 @@ def recognize():
         else:
             return redirect("/")
 
-# @app.route("/crop", methods=['GET'])
-# def crop():
-#     print("enter crop")
-#     return render_template("crop.html", cropData="''")
-
-
-# @app.route("/")
-# def index():
-#     print("enter index")
-#     return render_template("upload.html")
 
 @app.route("/upload", methods=['POST'])
 def upload_image():
@@ -109,7 +99,7 @@ def add_header(response):
     return response
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0")
 
 
 
