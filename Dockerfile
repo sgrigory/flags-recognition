@@ -20,7 +20,9 @@ RUN cat /etc/os-release
 
 EXPOSE 5000
 
-RUN ls
+COPY countries/data static/data
 
-CMD ["python", "app.py"]
+RUN find .
+
+CMD exec gunicorn --bind :5000 --workers 1 --threads 8 app:app
 
