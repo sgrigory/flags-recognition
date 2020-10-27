@@ -1,0 +1,30 @@
+name: Build and deploy to GKE
+
+on:
+  commit:
+    branches:
+    - deployment
+
+jobs:
+  setup-build-publish-deploy:
+    name: Setup, Build, Publish, and Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+      - uses: actions/checkout@v2
+
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+        with:
+          version: '290.0.1'
+          service_account_key: ${{ secrets.GKE_SA_KEY }}
+          project_id: ${{ secrets.GKE_PROJECT }}
+
+      - run: echo ${{ secrets.GKE_SA_KEY }} > key-file
+      - run: |-
+        gcloud auth activate-service-account github@flags-293518.iam.gserviceaccount.com --key-file=key-file
+
+      - name: Build, Publish, and Deploy
+
+        run: ./gcr.sh
+
+
