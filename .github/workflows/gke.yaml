@@ -24,7 +24,6 @@ jobs:
           gcloud auth activate-service-account github@flags-293518.iam.gserviceaccount.com --key-file=key-file
 
       - name: Build, Publish, and Deploy
-
         run: ./gcr.sh
 
 
