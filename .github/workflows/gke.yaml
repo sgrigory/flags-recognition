@@ -17,7 +17,9 @@ jobs:
           version: '290.0.1'
           service_account_key: ${{ secrets.GKE_SA_KEY }}
           project_id: ${{ secrets.GKE_PROJECT }}
-      - run: echo "${{ secrets.GKE_SA_KEY }}" > key-file
+      - run: echo "${{ secrets.GKE_SA_KEY }}"
+      - run: echo "${{ secrets.GKE_SA_KEY }}" > key-file.json
+      - run: pip show pyopenssl
       - run: |-
           gcloud auth activate-service-account github@flags-293518.iam.gserviceaccount.com --key-file=key-file
 
