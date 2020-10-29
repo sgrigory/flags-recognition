@@ -15,9 +15,9 @@ N_COORDS = 8
 
 INPUT_WIDTH, INPUT_HEIGHT = 299, 299
 
-DB_PATH = "sqlite:///countries/data/sqlite/countries.db"
+DB_PATH = "sqlite:///app_data/countries.db"
 
-MODEL_PATH = "run_[]_cls_233_lr_0.001_bs_256_ts_8_tp_15288561_8620_model.hdf5"
+MODEL_PATH = "app_data/run_[]_cls_233_lr_0.001_bs_256_ts_8_tp_15288561_8620_model.hdf5"
 
 
 class PredictionEngine:
