@@ -1,8 +1,8 @@
 #!/bin/bash
 
-mkdir app_data
-
 gsutil cp -r gs://flags-293518/app_data .
+
+ls -la
 
 gcloud builds submit --tag eu.gcr.io/flags-293518/image1 .
 
