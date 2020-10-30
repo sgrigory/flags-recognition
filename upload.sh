@@ -1,1 +1,1 @@
-gsutil cp -r app_data gs://flags-293518
+gsutil -m cp -r app_data gs://flags-293518
