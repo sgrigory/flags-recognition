@@ -12,15 +12,15 @@ RUN mkdir uploads
 
 COPY templates templates
 COPY static static
-COPY countries countries
+COPY app_data app_data
 
-COPY app.py utils.py run_[[]]_cls_233_lr_0.001_bs_256_ts_8_tp_15288561_8620_model.hdf5 ./
+COPY app.py utils.py ./
 
 RUN cat /etc/os-release
 
 EXPOSE 5000
 
-COPY countries/data static/data
+COPY app_data/PNG-128 static/app_data/PNG-128
 
 RUN find .
 
