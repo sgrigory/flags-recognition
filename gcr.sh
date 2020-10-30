@@ -1,6 +1,6 @@
 #!/bin/bash
 
-gsutil cp -r gs://flags-293518/app_data .
+gsutil -m cp -r gs://flags-293518/app_data .
 
 ls -la
 
