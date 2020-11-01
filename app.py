@@ -1,14 +1,23 @@
 import os
 import json
 import pandas as pd
+import yaml
 from flask import Flask, request, render_template, redirect, send_from_directory
 import matplotlib.image as mpimage
 
 from utils import PredictionEngine, INPUT_WIDTH, INPUT_HEIGHT
 
+
+CONFIG_FILE = "config.yaml"
+
+
 def create_app():
     app = Flask(__name__)
-    app.prediction_engine = PredictionEngine()
+    with open(CONFIG_FILE, "rt") as fl:
+        config = yaml.safe_load(fl)
+        app.config.update(config)
+    app.prediction_engine = PredictionEngine(db_path=app.config["DB_PATH"],
+                                             model_path=app.config["MODEL_PATH"])
     app.image = None
     return app
 
@@ -19,7 +28,9 @@ def recognize_get():
     return render_template("crop.html",
                            cropData="''", img_width="''", img_height="''",
                            x_coords="''", y_coords="''",
-                           pred_files="''", pred_names="''", probs="''")
+                           pred_files="''", pred_names="''", probs="''",
+                           img_path="'" + app.config["img_path"] + "'",
+                           )
 
 
 @app.route("/", methods=['POST'])
@@ -54,10 +65,12 @@ def recognize():
             print(x_coords)
             print(y_coords)
             pred_images = pd.merge(preds.reset_index(), app.prediction_engine.df[["flag_128", "name"]], on="name", how="left")
-            pred_files = json.dumps(list(pred_images["flag_128"].values[:5]))
-            pred_names = json.dumps(list(pred_images["name"].values[:5]))
+
+            num_preds = app.config["num_preds"]
+            pred_files = json.dumps(list(pred_images["flag_128"].values[:num_preds]))
+            pred_names = json.dumps(list(pred_images["name"].values[:num_preds]))
             probs = (100 * preds).round(2).astype(str)
-            probs = json.dumps(list(probs.values[:5]))
+            probs = json.dumps(list(probs.values[:num_preds]))
             print(pred_files)
             return render_template("crop.html", preds=preds.to_frame().to_html(),
                                    cropData=data,
@@ -67,6 +80,7 @@ def recognize():
                                    pred_files=pred_files,
                                    pred_names=pred_names,
                                    probs=probs,
+                                   img_path="'" + app.config["img_path"] + "'",
                                    )
         else:
             return redirect("/")

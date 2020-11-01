@@ -1,9 +1,7 @@
-function addPredictions(pred_files, pred_names, probs)
+function addPredictions(pred_files, pred_names, probs, img_path)
 {
 
 if (pred_files != ""){
-
-   var img_path = "static/app_data/PNG-128/"
 
    var i;
    for (i = 0; i < pred_files.length; i ++)

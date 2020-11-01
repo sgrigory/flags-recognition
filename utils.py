@@ -15,14 +15,10 @@ N_COORDS = 8
 
 INPUT_WIDTH, INPUT_HEIGHT = 299, 299
 
-DB_PATH = "sqlite:///app_data/countries.db"
-
-MODEL_PATH = "app_data/run_[]_cls_233_lr_0.001_bs_256_ts_8_tp_15288561_8620_model.hdf5"
-
 
 class PredictionEngine:
 
-    def __init__(self, db_path=DB_PATH, model_path=MODEL_PATH):
+    def __init__(self, db_path, model_path):
         self.model = models.load_model(model_path, custom_objects={'LeakyReLU': LeakyReLU})
 
         self.df = load_df(db_path)

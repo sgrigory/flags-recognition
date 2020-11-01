@@ -1,0 +1,4 @@
+DB_PATH: sqlite:///app_data/countries.db
+MODEL_PATH: app_data/run_[]_cls_233_lr_0.001_bs_256_ts_8_tp_15288561_8620_model.hdf5
+img_path: static/app_data/PNG-128/
+num_preds: 5
