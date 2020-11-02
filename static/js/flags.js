@@ -74,7 +74,7 @@ if (pred_files != ""){
    }
 
 
-function drawBorder(x, y, cropData, img, img_width, img_height, ctx)
+function drawBorder(x, y, cropData, img, img_width, img_height, ctx, orig_width, orig_height)
 {
 
 
@@ -88,8 +88,8 @@ function drawBorder(x, y, cropData, img, img_width, img_height, ctx)
 
     if ((x != "") && (y != ""))    {
 
-          var scale_x  = width0 / 299;
-          var scale_y  = height0 / 299;
+          var scale_x  = width0 / orig_width;
+          var scale_y  = height0 / orig_height;
 
           // Draw the area of the detected flag border
           ctx.beginPath();
@@ -110,7 +110,6 @@ function drawBorder(x, y, cropData, img, img_width, img_height, ctx)
 
 
 };
-
 
 
 function getContext(cnv, img){

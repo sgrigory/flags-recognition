@@ -13,9 +13,6 @@ from tensorflow.keras import applications, models
 
 N_COORDS = 8
 
-INPUT_WIDTH, INPUT_HEIGHT = 299, 299
-
-
 class PredictionEngine:
 
     def __init__(self, db_path, model_path):
@@ -25,6 +22,8 @@ class PredictionEngine:
         self.n_classes = self.df.shape[0]
 
         self.module = applications.inception_v3
+        self.input_width = 299
+        self.input_height = 299
 
 
     def preprocess_pred(self, example_raw, d_contr=1, d_light=0, scale=1, shift=0):
@@ -36,12 +35,12 @@ class PredictionEngine:
         preds, coords, _ = self.pred_resize_one_image(example_tuned, scale=scale, shift=shift)
         return preds[:5], coords
 
-    def pred_resize_one_image(self, example, width=INPUT_WIDTH, height=INPUT_HEIGHT, scale=1, shift=0):
+    def pred_resize_one_image(self, example, scale=1, shift=0):
         ex_w, ex_h = example.shape[:2]
-        min_factor = min(width / ex_w, height / ex_h) * scale
+        min_factor = min(self.input_width / ex_w, self.input_height / ex_h) * scale
         resized_example1 = cv2.resize(example, (int(ex_h * min_factor), int(ex_w * min_factor)))
-        blank = np.random.rand(width, height, 3)  # np.zeros((width, height, 3))
-        x0, y0 = int(width * shift), int(height * shift)
+        blank = np.random.rand(self.input_width, self.input_height, 3)  # np.zeros((width, height, 3))
+        x0, y0 = int(self.input_width * shift), int(self.input_height * shift)
         x_min = min(resized_example1.shape[0] + x0, blank.shape[0])
         y_min = min(resized_example1.shape[1] + y0, blank.shape[1])
         blank[x0: x_min, y0: y_min, :] = resized_example1[: x_min - x0, : y_min - y0, :]

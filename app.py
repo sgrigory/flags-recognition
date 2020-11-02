@@ -4,8 +4,9 @@ import pandas as pd
 import yaml
 from flask import Flask, request, render_template, redirect, send_from_directory
 import matplotlib.image as mpimage
+import logging
 
-from utils import PredictionEngine, INPUT_WIDTH, INPUT_HEIGHT
+from utils import PredictionEngine
 
 
 CONFIG_FILE = "config.yaml"
@@ -15,10 +16,12 @@ def create_app():
     """
     Prepare the app: load configuration file and create the prediction engine
     """
+    logging.getLogger().setLevel(logging.DEBUG)
+
     app = Flask(__name__)
     with open(CONFIG_FILE, "rt") as fl:
         config = yaml.safe_load(fl)
-        print(config)
+        logging.debug(config)
         app.config.update(config)
     app.prediction_engine = PredictionEngine(db_path=app.config["DB_PATH"],
                                              model_path=app.config["MODEL_PATH"])
@@ -33,12 +36,10 @@ def recognize_get():
     """
     Render the page before predictions are made - with or without uploaded image
     """
-    print(app.config)
     if app.image is None:
         visibility = "hidden"
     else:
         visibility = "visible"
-    print(f"crop with {visibility}")
 
     return render_template("crop.html",
                            cropData="''", img_width="''", img_height="''",
@@ -47,6 +48,8 @@ def recognize_get():
                            img_path="'" + app.config["img_path"] + "'",
                            visibility=visibility,
                            uploaded_img_path=app.config["uploaded_img_path"],
+                           input_width=app.prediction_engine.input_width,
+                           input_height=app.prediction_engine.input_height,
                            )
 
 
@@ -56,7 +59,7 @@ def recognize():
     Render the page after predictions are made
     """
     if app.image is None:
-        print("app.image is None, redirecting")
+        logging.debug("app.image is None, redirecting")
         return redirect("/")
 
     # Get cropper data
@@ -64,8 +67,6 @@ def recognize():
     # If cropper data is available
     if data is not None:
         coords = json.loads(data)
-        print(type(coords))
-        print(coords)
         # Get coordinates of the cropper
         x0 = int(coords["x"])
         x1 = int(coords["x"] + coords["width"])
@@ -78,19 +79,14 @@ def recognize():
         y0 = max(min(y0, app.image.shape[0]), 0)
         y1 = max(min(y1, app.image.shape[0]), 0)
 
-        print(app.image[y0: y1, x0: x1].shape)
-
         # If cropper box is not empty
         if (y1 > y0) and (x1 > x0):
 
             # Get predictions for classes and coordinates of the identified area
             preds, coords = app.prediction_engine.preprocess_pred(app.image[y0: y1, x0: x1])
-            print(coords)
             # Rescale the coordinates from fractions of 1 to pixels of original image
-            y_coords = [int(x) for x in (coords[::2] * INPUT_WIDTH).astype(int)]
-            x_coords = [int(y) for y in (coords[1::2] * INPUT_HEIGHT).astype(int)]
-            print(x_coords)
-            print(y_coords)
+            y_coords = [int(x) for x in (coords[::2] * app.prediction_engine.input_width).astype(int)]
+            x_coords = [int(y) for y in (coords[1::2] * app.prediction_engine.input_height).astype(int)]
             # Attach to predicted classes names of countries
             pred_images = pd.merge(preds.reset_index(), app.prediction_engine.df[["flag_128", "name"]],
                                    on="name", how="left")
@@ -114,9 +110,11 @@ def recognize():
                                    img_path="'" + app.config["img_path"] + "'",
                                    visibility="visible",
                                    uploaded_img_path=app.config["uploaded_img_path"],
+                                   input_width=app.prediction_engine.input_width,
+                                   input_height=app.prediction_engine.input_height,
                                    )
         else:
-            print("cropper is invalid, redirecting")
+            logging.debug("cropper is invalid, redirecting")
             return redirect("/")
 
 
@@ -125,22 +123,21 @@ def upload_image():
     """
     Get uploaded image and save it to a file
     """
-    print("upload_image")
+    logging.debug("upload_image")
     if "file" not in request.files:
         return "no file"
-    print("found a file")
-    print(request.files)
+        logging.debug("found a file")
     file = request.files["file"]
-    print("saving")
+    logging.debug("saving")
     os.makedirs("uploads", exist_ok=True)
     file.save(app.config["uploaded_img_path"])
     app.image = mpimage.imread(file)
-    print("saved")
+    logging.debug("saved")
     return "", 204
 
 @app.route("/uploads/<filename>")
 def upload(filename):
-    print("enter get file")
+    logging.debug("enter get file")
     return send_from_directory("uploads", filename)
 
 
