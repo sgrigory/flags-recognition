@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,45 +7,7 @@
   <title>Select the area</title>
   <link rel="stylesheet" href="/static/css/cropper.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.css">
-  <style>
-    .container {
-      margin: 20px auto;
-      max-width: 640px;
-    }
-
-    .column {
-      float: center;
-      width: 45%;
-    }
-
-    .row: after {
-    content: "";
-    display: table;
-    clear: both;
-
-    }
-
-    .row1: after {
-    content: "";
-    display: table;
-    clear: both;
-
-    }
-
-
-    .column1 {
-      float: left;
-      width: 45%;
-    }
-
-    #recognize {
-      font-size: 24px;
-      width: 100px;
-      height: 100px;
-
-    }
-
-  </style>
+  <link rel="stylesheet" href="/static/css/flags.css">
 </head>
 <body>
 
@@ -71,22 +32,12 @@
   </div>
   </div>
 
-      <!--<div style="width:50%">-->
-        <!--<form action="{{ url_for('upload_image') }}" class="dropzone" id="my-dropzone">-->
-        <!--</form>-->
-      <!--</div>-->
 
-      <!--<div class="container">-->
-        <!--<form id="send_crop" action="/" method="POST">-->
-          <!--<button type="button" id="recognize" name="bt" value="init">Go</button>-->
-          <!--<input id="secret" type="hidden" name="secret" value="a">-->
-        <!--</form>-->
-      <!--</div>-->
 <div>
   <div class="row1">
     <div class="column1" id="column1">
-      <div id="img-container">
-        <img id="image" src="/uploads/example1.jpeg" alt="Picture" style="width:100%; pointer-events:auto;">
+      <div id="img-container" style="visibility:{{visibility|safe}};">
+        <img id="image" src="{{uploaded_img_path|safe}}" alt="Picture" style="width:100%; pointer-events:auto;">
         <canvas id="myCanvas" style="z-index: 100; pointer-events:none;"> </canvas>
       </div>
     </div>
@@ -101,28 +52,12 @@
 
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/dropzone/5.7.1/min/dropzone.min.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script>
-
-      Dropzone.autoDiscover = false;
-      Dropzone.options.dzone = {
-          acceptedFiles: "*.jpeg, *.jpg"
-          }
-
-      $(function() {
-        var myDropzone = new Dropzone("#my-dropzone");
-        myDropzone.on("queuecomplete", function(file) {
-          // Called when all files in the queue finish uploading.
-          window.location = "{{ url_for('recognize') }}";
-        });
-      })
-    </script>
-
-
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script src="/static/js/cropper.js"></script>
   <script src="/static/js/flags.js"></script>
-  <script>
 
+  <script>
+    createDropzone("{{ url_for('recognize') }}")
 
     var img = document.getElementById("image");
     var cnv = document.getElementById("myCanvas");
@@ -141,39 +76,12 @@
     };
 
     // Show possible matches
-
     pred_files = {{pred_files|safe}};
     pred_names = {{pred_names|safe}};
     probs = {{probs|safe}};
     addPredictions(pred_files, pred_names, probs, {{img_path|safe}});
 
-
-
-    window.addEventListener('DOMContentLoaded', function () {
-
-      console.log("DOMContentLoaded!");
-
-      var image = document.querySelector('#image');
-      console.log("create new cropper", {{cropData|safe}});
-      var cropper = new Cropper(image, {
-        aspectRatio: 1,
-        data: {{cropData|safe}},
-        movable: false,
-        zoomable: false,
-        rotatable: false,
-        scalable: false
-      });
-      console.log(cropper);
-
-      document.getElementById('recognize').onclick = function () {
-       console.log("recognize clicked!");
-
-        document.getElementById('secret').value = JSON.stringify(cropper.getData());
-        cropper.destroy();
-        document.getElementById("send_crop").submit();
-      };
-    });
-
+    createCropper({{cropData|safe}});
 
   </script>
 

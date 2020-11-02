@@ -1,0 +1,34 @@
+.container {
+      margin: 20px auto;
+      max-width: 640px;
+    }
+
+.column {
+  float: center;
+  width: 45%;
+}
+
+.row: after {
+content: "";
+display: table;
+clear: both;
+
+}
+
+.row1: after {
+content: "";
+display: table;
+clear: both;
+
+}
+
+
+.column1 {
+  float: left;
+  width: 45%;
+}
+
+#recognize {
+  font-size: 24px;
+  width: 100px;
+  height: 100px;

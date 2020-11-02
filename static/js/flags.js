@@ -1,3 +1,51 @@
+function createDropzone(url_recognize)
+{
+  Dropzone.autoDiscover = false;
+  Dropzone.options.dzone = {
+          acceptedFiles: "*.jpeg, *.jpg"
+          }
+
+  $(function() {
+    var myDropzone = new Dropzone("#my-dropzone");
+    myDropzone.on("queuecomplete", function(file) {
+      // Called when all files in the queue finish uploading.
+
+      document.getElementById("img-container").style.visibility = "visible";
+      window.location = url_recognize;
+    });
+  })
+}
+
+
+function createCropper(cropData)
+{
+
+window.addEventListener('DOMContentLoaded', function () {
+
+      console.log("DOMContentLoaded!");
+
+      var image = document.querySelector('#image');
+      console.log("create new cropper", cropData);
+      var cropper = new Cropper(image, {
+        aspectRatio: 1,
+        data: cropData,
+        movable: false,
+        zoomable: false,
+        rotatable: false,
+        scalable: false
+      });
+      console.log(cropper);
+
+      document.getElementById('recognize').onclick = function () {
+       console.log("recognize clicked!");
+
+        document.getElementById('secret').value = JSON.stringify(cropper.getData());
+        cropper.destroy();
+        document.getElementById("send_crop").submit();
+      };
+    });
+}
+
 function addPredictions(pred_files, pred_names, probs, img_path)
 {
 
